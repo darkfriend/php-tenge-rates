@@ -1,30 +1,30 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: naffiq
- * Date: 10/11/2016
- * Time: 4:09 PM
- */
 
-namespace naffiq\tenge;
+namespace Darkfriend\TengeRates;
 
 /**
  * Class Currency
  *
  * Реализует конвертацию для каждой конкретной валюты
  *
- * @package naffiq\tenge
+ * @package Darkfriend\TengeRates
  */
 class Currency
 {
     /**
      * @var string Код валюты
      */
-    public $title;
+    public $name;
+
+    /**
+     * @var string Название валюты
+     */
+    public $fullname;
+
     /**
      * @var string Дата
      */
-    public $pubDate;
+    public $date;
 
     /**
      * @var float
@@ -32,70 +32,97 @@ class Currency
     public $price;
 
     /**
-     * @var float
+     * @var float Изменение
      */
     public $change;
 
     /**
-     * @var int
-     */
-    public $quantity;
-
-    /**
-     * @var string
+     * @var string Порядок изменения
      */
     public $index;
 
     /**
-     * Currency constructor.
-     * @param string $title Название валюты
-     * @param string $pubDate
-     * @param float $price
-     * @param float $change
-     * @param int $index
-     * @param int $quantity
+     * @var int Количество
      */
-    public function __construct($title, $pubDate, $price, $change, $index, $quantity)
+    public $quantity;
+
+    /**
+     * Currency constructor.
+     *
+     * @param string $fullname Название валюты
+     * @param string $name Код валюты
+     * @param string $date Дата
+     * @param float $price Цена
+     * @param float $change Изменение
+     * @param string $index Порядок изменения
+     * @param int $quantity Количество
+     */
+    public function __construct(
+        string $fullname,
+        string $name,
+        string $date,
+        float $price,
+        float $change,
+        string $index,
+        int $quantity
+    )
     {
-        $this->title = $title;
-        $this->pubDate = $pubDate;
+        $this->fullname = $fullname;
+        $this->name = $name;
+        $this->date = $date;
         $this->price = $price;
         $this->change = $change;
         $this->index = $index;
         $this->quantity = $quantity;
     }
 
-    public static function fromArray(array $data)
-    {
-        return new static($data['title'], $data['pubDate'], (double)$data['description'], (double)$data['change'], $data['index'], (int)$data['quant']);
-    }
-
     /**
-     * @param $quantity
-     *
-     * @return double
+     * @param array $data
+     * @return self
      */
-    public function toTenge($quantity)
+    public static function fromArray(array $data): self
     {
-        return $quantity * $this->price / $this->quantity;
+        return new static(
+            $data['fullname'],
+            $data['title'],
+            $data['date'],
+            (float)$data['description'],
+            (float)$data['change'],
+            $data['index'],
+            (int)$data['quant']
+        );
     }
 
     /**
-     * @param $quantity
+     * @param float $quantity
+     * @param int $precision
+     * @param int $mode
      * @return float
      */
-    public function fromTenge($quantity)
+    public function toTenge(float $quantity, int $precision = 2, int $mode = \PHP_ROUND_HALF_UP): float
     {
-        return $quantity / $this->price * $this->quantity;
+        return round($quantity * $this->price / $this->quantity, $precision, $mode);
+    }
+
+    /**
+     * @param float $quantity
+     * @param int $precision
+     * @param int $mode
+     * @return float
+     */
+    public function fromTenge(float $quantity, int $precision = 2, int $mode = \PHP_ROUND_HALF_UP): float
+    {
+        return round($quantity / ($this->price * $this->quantity), $precision, $mode);
     }
 
     /**
      * Проверяет, актуален ли текущий курс
      *
      * @return bool
+     * @throws \Exception
      */
-    public function isFresh()
+    public function isFresh(): bool
     {
-        return $this->pubDate == date('d.m.y');
+        return new \DateTime($this->date) == (new \DateTime())->setTime(0, 0);
     }
 }

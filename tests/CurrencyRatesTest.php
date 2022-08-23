@@ -1,41 +1,34 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: naffiq
- * Date: 6/16/17
- * Time: 16:30
- */
-
-use naffiq\tenge\CurrencyRates;
-use naffiq\tenge\Currency;
+use Darkfriend\TengeRates\CurrencyRates;
+use Darkfriend\TengeRates\Currency;
 
 class CurrencyRatesTest extends \PHPUnit\Framework\TestCase
 {
     public function testInitialization()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
+        $rates = new CurrencyRates('', 1, __DIR__ . '/data/sample.xml');
 
         $this->assertNotEmpty($rates->convertToTenge('RUB'));
     }
 
     public function testRSSAvailability()
     {
-        $rates = new CurrencyRates(CurrencyRates::URL_RATES_MAIN, 2);
+        $rates = new CurrencyRates('23.08.2022', 2, __DIR__ . '/data/sample.xml');
 
         $this->assertNotEmpty($rates->convertToTenge('RUB'));
     }
 
     public function testRSSAllAvailability()
     {
-        $rates = new CurrencyRates(CurrencyRates::URL_RATES_ALL, 2);
+        $rates = new CurrencyRates('23.08.2022', 2, __DIR__ . '/data/sample.xml');
 
         $this->assertNotEmpty($rates->convertToTenge('RUB'));
     }
 
     public function testGetRates()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
+        $rates = new CurrencyRates('', 1, __DIR__ . '/data/sample.xml');
 
         $this->assertNotEmpty($rates->getCurrency('RUB'));
         $this->assertNotEmpty($rates->getCurrency('RUR'));
@@ -43,35 +36,37 @@ class CurrencyRatesTest extends \PHPUnit\Framework\TestCase
 
     public function testGetRatesThatDoesNotExists()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
+        $rates = new CurrencyRates('23.08.2022', 1, __DIR__ . '/data/sample.xml');
 
         $this->expectException('\Exception');
-        $rates->getCurrency('NAFFIQ_DOLLAR');
+        $rates->getCurrency('DOLLAR');
     }
 
     public function testConvertToTenge()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
+        $rates = new CurrencyRates('23.08.2022', 1, __DIR__ . '/data/sample.xml');
 
-        $this->assertEquals(5.53, $rates->convertToTenge('RUR'));
+        $this->assertEquals(5.43, $rates->convertToTenge('RUR'));
     }
 
     public function testConvertFromTenge()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
+        $rates = new CurrencyRates('23.08.2022', 1, __DIR__ . '/data/sample.xml');
 
-        $this->assertEquals(3, $rates->convertFromTenge('RUR', 16.59));
+        $this->assertEquals(3, $rates->convertFromTenge('RUR', 16.29));
     }
 
     public function testCountable()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
-        $this->assertEquals(3, count($rates));
+        $rates = new CurrencyRates('23.08.2022', 1, __DIR__ . '/data/sample.xml');
+
+        $this->assertEquals(39, count($rates));
     }
 
     public function testIteratorAggregate()
     {
-        $rates = new CurrencyRates(__DIR__ . '/data/sample.xml');
+        $rates = new CurrencyRates('23.08.2022', 1, __DIR__ . '/data/sample.xml');
+
         foreach ($rates as $rate) {
             $this->assertTrue($rate instanceof Currency);
         }

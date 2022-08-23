@@ -1,12 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: naffiq
- * Date: 10/11/2016
- * Time: 4:07 PM
- */
 
-namespace naffiq\tenge;
+namespace Darkfriend\TengeRates;
 
 
 use LaLit\XML2Array;
@@ -14,38 +8,74 @@ use Traversable;
 
 /**
  * Class CurrencyRates
- * @package naffiq\tenge
+ * @package Darkfriend\TengeRates
  */
 class CurrencyRates implements \IteratorAggregate, \Countable
 {
-    // Ссылка на все валюты
-    const URL_RATES_ALL = "http://old.nationalbank.kz/rss/rates_all.xml";
-    // Ссылка на основные валюты
-    const URL_RATES_MAIN = "http://old.nationalbank.kz/rss/rates.xml";
+    /**
+     * Ссылка на все валюты
+     */
+    const URL_RATES_ALL = 'https://nationalbank.kz/rss/get_rates.cfm';
 
     /**
      * @var string Ссылка на API Национального Банка Казахстана
      */
-    private $url = self::URL_RATES_MAIN;
+    protected $url;
 
     /**
      * @var Currency[]
      */
-    private $_rates = [];
+    protected $_rates = [];
+
+    /**
+     * @var int
+     */
+    protected $timeout;
+
+    /**
+     * @var string
+     */
+    protected $date;
+
+    /**
+     * @var bool
+     */
+    protected $isPath = false;
+
+    /**
+     * @var bool
+     */
+    protected $isSsl = true;
 
     /**
      * CurrencyRates constructor.
      *
-     * @param string $url
+     * @param string $date
      * @param int $timeout Timeout for getting currency data
+     * @param string $url url or path
+     * @throws \Exception
      */
-    public function __construct($url = self::URL_RATES_MAIN, $timeout = 1)
+    public function __construct(
+        string $date = '',
+        int $timeout = 10,
+        string $url = self::URL_RATES_ALL
+    )
     {
+        $this->date = $date ?: date('Y-m-d');
+        $this->timeout = $timeout;
         $this->url = $url;
-        $data = self::getRates($timeout);
 
-        foreach ($data['rss']['channel']['item'] as $currencyRate) {
+        if (strpos($url, 'http') === false) {
+            $this->isPath = true;
+        } else {
+            $this->isSsl = strpos($url, 'https') !== false;
+        }
+
+        $data = $this->getRates();
+
+        foreach ($data['rates']['item'] as $currencyRate) {
             $currencyTitle = strtoupper($currencyRate['title']);
+            $currencyRate['date'] = $this->date;
             $this->_rates[$currencyTitle] = Currency::fromArray($currencyRate);
         }
     }
@@ -54,12 +84,12 @@ class CurrencyRates implements \IteratorAggregate, \Countable
      * Метод для конвертации валюты в тенге
      *
      * @param string    $currencyCode   код валюты
-     * @param int       $quantity       кол-во переводимой валюты
+     * @param float     $quantity       кол-во переводимой валюты
      *
-     * @return double
+     * @return float
      * @throws \Exception
      */
-    public function convertToTenge($currencyCode, $quantity = 1)
+    public function convertToTenge(string $currencyCode, float $quantity = 1): float
     {
         return $this->getCurrency($currencyCode)->toTenge($quantity);
     }
@@ -68,12 +98,12 @@ class CurrencyRates implements \IteratorAggregate, \Countable
      * Метод для конвертации валюты из тенге
      *
      * @param string    $currencyCode   код валюты
-     * @param int       $quantity       кол-во переводимой валюты
+     * @param float     $quantity       кол-во переводимой валюты
      *
      * @return float
      * @throws \Exception
      */
-    public function convertFromTenge($currencyCode, $quantity = 1)
+    public function convertFromTenge(string $currencyCode, float $quantity = 1): float
     {
         return $this->getCurrency($currencyCode)->fromTenge($quantity);
     }
@@ -85,12 +115,14 @@ class CurrencyRates implements \IteratorAggregate, \Countable
      * @return Currency
      * @throws \Exception
      */
-    public function getCurrency($currencyCode)
+    public function getCurrency(string $currencyCode): Currency
     {
         $currencyCode = strtoupper($currencyCode);
 
-        // Т.к. Нацбанк Казахстана использует устаревший код RUR, проверяем
-        if ($currencyCode == 'RUB' && !empty($this->_rates['RUR'])) $currencyCode = 'RUR';
+        // Т.к. Нацбанк Казахстана ранее использовал устаревший код RUR, теперь меняем его на RUB
+        if ($currencyCode === 'RUR' && !empty($this->_rates['RUB'])) {
+            $currencyCode = 'RUB';
+        }
 
         if (!empty($this->_rates[$currencyCode])) {
            return $this->_rates[$currencyCode];
@@ -103,14 +135,27 @@ class CurrencyRates implements \IteratorAggregate, \Countable
      * Конвертирует XML с курсом валют в массив
      *
      * @return array
+     * @throws \Exception
      */
-    private function getRates($timeout = 1)
+    public function getRates(): array
     {
-        $options = stream_context_create(['http'=> ['timeout' => $timeout]]);
-        $data = file_get_contents($this->url, false, $options);
+        $options = stream_context_create([
+            $this->isSsl ? 'https' : 'http' => ['timeout' => $this->timeout]
+        ]);
 
-        $xmlData = XML2Array::createArray($data);
-        return $xmlData;
+        if ($this->isPath) {
+            $url = $this->url;
+        } else {
+            $url = $this->url
+                . '?'
+                . http_build_query([
+                    'fdate' => date('d.m.Y', strtotime($this->date))
+                ]);
+        }
+
+        $data = file_get_contents($url, false, $options);
+
+        return XML2Array::createArray($data);
     }
 
     /**
