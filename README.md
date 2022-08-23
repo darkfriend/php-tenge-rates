@@ -2,9 +2,6 @@
 
 [![PHP version](https://badge.fury.io/ph/darkfriend%2Fphp-tenge-rates.svg)](https://badge.fury.io/ph/darkfriend%2Fphp-tenge-rates)
 [![Travis CI build](https://api.travis-ci.org/darkfriend/php-tenge-rates.svg?branch=master "Travis CI build")](https://travis-ci.org/darkfriend/php-tenge-rates)
-[![Code Climate](https://codeclimate.com/github/darkfriend/php-tenge-rates/badges/gpa.svg)](https://codeclimate.com/github/darkfriend/php-tenge-rates)
-[![Test Coverage](https://codeclimate.com/darkfriend/naffiq/php-tenge-rates/badges/coverage.svg)](https://codeclimate.com/github/darkfriend/php-tenge-rates/coverage)
-[![Issue Count](https://codeclimate.com/github/darkfriend/php-tenge-rates/badges/issue_count.svg)](https://codeclimate.com/github/darkfriend/php-tenge-rates)
 
 Данный компонент является оберткой для обработки курса от Нацбанка.
 
