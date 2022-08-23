@@ -3,8 +3,7 @@
     "description": "PHP wrapper for Kazakhstan Official National Bank tenge currency rates",
     "require": {
         "php": ">=7.0",
-        "rquadling/lalit": "^1.5",
-        "darkfriend/php7-xml": "^2.0"
+        "rquadling/lalit": "^1.5"
     },
     "license": "MIT",
     "authors": [

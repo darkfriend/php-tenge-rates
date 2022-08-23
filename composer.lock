@@ -4,68 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d05394baa369f095a287c0c93ee0f3a",
+    "content-hash": "1869773f27e02c819d89ddede6a84c87",
     "packages": [
-        {
-            "name": "darkfriend/php7-xml",
-            "version": "2.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/darkfriend/php7-xml.git",
-                "reference": "e23830da8feb77f3444fb6931281c4d95ed5cdb4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/darkfriend/php7-xml/zipball/e23830da8feb77f3444fb6931281c4d95ed5cdb4",
-                "reference": "e23830da8feb77f3444fb6931281c4d95ed5cdb4",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "codeception/codeception": "^4.1",
-                "codeception/module-asserts": "^1.0.0",
-                "codeception/module-phpbrowser": "^1.0.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "darkfriend\\helpers\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "darkfriend",
-                    "email": "hi@darkfriend.ru",
-                    "homepage": "https://darkfriend.ru"
-                }
-            ],
-            "description": "PHP7 library for encode/decode xml",
-            "homepage": "https://github.com/darkfriend/php7-xml",
-            "keywords": [
-                "PHP7",
-                "array to xml",
-                "darkfriend",
-                "dev",
-                "development",
-                "helper",
-                "php",
-                "xml",
-                "xml decode",
-                "xml encode",
-                "xml to array"
-            ],
-            "support": {
-                "issues": "https://github.com/darkfriend/php7-xml/issues",
-                "source": "https://github.com/darkfriend/php7-xml/tree/2.0.0"
-            },
-            "time": "2021-02-17T16:44:49+00:00"
-        },
         {
             "name": "rquadling/lalit",
             "version": "1.6.3",
